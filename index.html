@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ainsoft</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+    <h2 class="logo">Ainsoft</h2>
+    <div class="nav-buttons">
+        <button id="themeBtn">☀ / 🌙</button>
+        <button id="accountBtn">Make Account</button>
+        <button id="messageBtn" class="hidden">Message</button>
+    </div>
+</nav>
+
+<section id="front">
+    <div class="hero">
+        <h1>You are not alone</h1>
+        <p>Ainsoft is an anonymous messaging platform where
+         users can vent, rant, or share their thoughts
+        freely without fear of judgement. It provides a safe space
+    for people to express their feelings, release stress, or
+talk about problems while remaining completely anonymous.</p>
+    </div>
+
+    <div class="image-scroll">
+    <img src="https://i.pinimg.com/736x/14/07/a4/1407a4097f7e50cbbcc5c9b9ef285028.jpg">
+    <img src="https://i.pinimg.com/736x/09/05/79/0905795b671cd9055940e11ea8452bc7.jpg">
+    <img src="https://i.pinimg.com/1200x/d0/1b/cf/d01bcfc5d1c0a4ff1d37952739800844.jpg">
+    <img src="https://i.pinimg.com/736x/74/ef/85/74ef851f477a6aeda2103fa273e126dc.jpg">
+</div>
+</section>
+
+<section id="account" class="hidden">
+    <div class="card">
+        <h2>Create Account</h2>
+        <input type="text" placeholder="Email or Username">
+        <input type="password" placeholder="Password">
+        <button id="createAccount">Create Account</button>
+    </div>
+</section>
+
+<section id="chat" class="hidden">
+    <div class="chat-card">
+        <div class="chat-header">
+            <button id="newChat">+ New Vent</button>
+        </div>
+
+        <div class="chat-box" id="chatBox"></div>
+
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Type here...">
+            <button id="sendBtn">Send</button>
+        </div>
+    </div>
+</section>
+
+<footer id="footer">
+    <h3>Contacts</h3>
+    <p>Email: ainsoftcompanyph@gmail.com</p>
+    <p>Phone: +63 9549977096</p>
+    <p>Address:  1571 Toursdale dr., Easton, Pennsylvania, United States, 1804</p>
+    <p>© 2026 Ainsoft</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
