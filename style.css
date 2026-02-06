@@ -88,7 +88,8 @@ body{
 
 .page{display:none;height:calc(100vh - 70px);padding:8px 12px;text-align:center;background: var(--bg);}
 .page.active{display:block}
-.page.full{padding:59px;display:flex;flex-direction:column}
+.page.full{padding:59px;display:none;flex-direction:column}
+.page.full.active{display:flex}
 .scrollable{overflow-y:auto;max-height:calc(100vh - 70px);padding-bottom:40px}
 
 .hero{max-width:50%;margin:50px auto;border-radius:50px;display:block}
@@ -164,5 +165,6 @@ button{padding:14px 20px;border:none;border-radius:9px 9px;background:#3131fd;co
   object-fit:cover;
   border-radius:30px;
 }
+
 
 
