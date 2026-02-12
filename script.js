@@ -1,5 +1,3 @@
-// AINSOFT AI CHAT SCRIPT (FREE, OFFLINE, HUMAN-LIKE)
-
 let history = [];
 let lastMood = 'neutral';
 let lastReply = "";
@@ -8,7 +6,7 @@ function showSection(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 
-  // active nav highlight
+ 
   document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
   const navMap = { home:'nav-home', features:'nav-features', message:'nav-message' };
   if(navMap[id]) document.getElementById(navMap[id]).classList.add('active');
@@ -17,7 +15,7 @@ function showSection(id){
 const toggle = document.getElementById("themeToggle");
 const root = document.documentElement;
 
-// load saved theme
+
 const savedTheme = localStorage.getItem("theme");
 if(savedTheme){
   root.setAttribute("data-theme", savedTheme);
@@ -80,9 +78,6 @@ function generateReply(msg, vent){
     return reply;
   }
 
-  // =====================
-  // VENT MODE
-  // =====================
   if(vent){
     const ventReplies = [
       "Nandito lang ako. You don’t have to explain everything. Just let it out.",
@@ -94,9 +89,6 @@ function generateReply(msg, vent){
     return pickRandom(ventReplies);
   }
 
-  // =====================
-  // SAD
-  // =====================
   if(mood === 'sad'){
     const sadReplies = [
       "I’m really sorry you’re feeling this way. Alam mo, minsan kahit anong lakas natin, napapagod din talaga. And that doesn’t make you weak.",
@@ -108,9 +100,6 @@ function generateReply(msg, vent){
     return pickRandom(sadReplies);
   }
 
-  // =====================
-  // ANGRY
-  // =====================
   if(mood === 'angry'){
     const angryReplies = [
       "Ramdam ko yung galit mo. Minsan galit is pain that wasn’t heard.",
@@ -122,9 +111,6 @@ function generateReply(msg, vent){
     return pickRandom(angryReplies);
   }
 
-  // =====================
-  // LONELY
-  // =====================
   if(mood === 'lonely'){
     const lonelyReplies = [
       "Masakit talaga ang pakiramdam ng mag-isa, lalo na kapag pakiramdam mo walang nakakaintindi.",
@@ -136,9 +122,6 @@ function generateReply(msg, vent){
     return pickRandom(lonelyReplies);
   }
 
-  // =====================
-  // CONFUSED
-  // =====================
   if(mood === 'confused'){
     const confusedReplies = [
       "Nakakapagod talaga kapag hindi mo alam kung saan ka papunta.",
@@ -150,9 +133,6 @@ function generateReply(msg, vent){
     return pickRandom(confusedReplies);
   }
 
-  // =====================
-  // HAPPY
-  // =====================
   if(mood === 'happy'){
     const happyReplies = [
       "I’m really glad you shared this. Mahalaga ring kilalanin ang mga sandaling gumagaan ang pakiramdam.",
@@ -164,9 +144,6 @@ function generateReply(msg, vent){
     return pickRandom(happyReplies);
   }
 
-  // =====================
-  // CONTEXT-AWARE NEUTRAL
-  // =====================
   if(history.length >= 4){
     const contextReplies = [
       "I’m still here, reading everything you share. Hindi ka nag-iisa sa kwento mo.",
@@ -178,9 +155,6 @@ function generateReply(msg, vent){
     return pickRandom(contextReplies);
   }
 
-  // =====================
-  // DEFAULT NEUTRAL
-  // =====================
   const neutralReplies = [
     "Salamat sa pagbabahagi. I’m here with you.",
     "You don’t need perfect words. Safe ka dito.",
@@ -191,3 +165,135 @@ function generateReply(msg, vent){
 
   return pickRandom(neutralReplies);
 }
+
+
+const freedomWall = document.getElementById('freedomWall');
+const defaultPosts = [
+  { img: "https://i.pinimg.com/736x/1f/d8/1d/1fd81d1665dde533c793dd35eb43cd6d.jpg" },
+  { img: "https://i.pinimg.com/736x/f7/d3/48/f7d348244d4809691c50b611a32789e2.jpg" },
+  { img: "https://i.pinimg.com/736x/e9/78/48/e978486e5cea9ed8c247d631388b45ad.jpg" },
+  { img: "https://i.pinimg.com/736x/eb/b7/da/ebb7dacd5a646252bfa0a66f7d01dbb2.jpg" },
+];
+
+
+let posts = JSON.parse(localStorage.getItem('posts')) || defaultPosts;
+
+function renderPosts() {
+  freedomWall.innerHTML = '';
+  posts.forEach((postData, index) => {
+    const post = document.createElement('div');
+    post.classList.add('wall-post', 'fade-in');
+    post.style.backgroundColor = postData.color || '#ffffff';
+    post.setAttribute('draggable', true);
+    post.dataset.index = index;
+
+    if (postData.text) {
+      const p = document.createElement('p');
+      p.textContent = postData.text;
+      post.appendChild(p);
+    }
+
+    if (postData.img) {
+      const img = document.createElement('img');
+      img.classList.add('img-card');
+      img.src = postData.img;
+      post.appendChild(img);
+    }
+
+   
+    const actions = document.createElement('div');
+    actions.classList.add('post-actions');
+
+   const likeBtn = document.createElement('button');
+likeBtn.classList.add('like-btn');
+
+likeBtn.textContent = postData.liked ? '❤️' : '🤍';
+
+likeBtn.onclick = () => {
+  postData.liked = !postData.liked; 
+  likeBtn.textContent = postData.liked ? '❤️' : '🤍'; 
+  savePosts(); 
+};
+    const deleteBtn = document.createElement('button');
+    deleteBtn.classList.add('delete-btn');
+    deleteBtn.textContent = '🗑️';
+    deleteBtn.onclick = () => {
+      posts.splice(index, 1);
+      savePosts();
+      renderPosts();
+    };
+
+    actions.appendChild(likeBtn);
+    actions.appendChild(deleteBtn);
+    post.appendChild(actions);
+
+    
+    post.addEventListener('dragstart', dragStart);
+    post.addEventListener('dragover', dragOver);
+    post.addEventListener('drop', dropPost);
+
+    freedomWall.appendChild(post);
+  });
+}
+
+
+let draggedIndex = null;
+
+function dragStart(e) {
+  draggedIndex = parseInt(e.currentTarget.dataset.index);
+}
+
+function dragOver(e) {
+  e.preventDefault();
+}
+
+function dropPost(e) {
+  const targetIndex = parseInt(e.currentTarget.dataset.index);
+  if (draggedIndex === targetIndex) return;
+
+ 
+  [posts[draggedIndex], posts[targetIndex]] = [posts[targetIndex], posts[draggedIndex]];
+  savePosts();
+  renderPosts();
+}
+
+
+function addPost() {
+  const text = document.getElementById('postText').value.trim();
+  const color = document.getElementById('postColor').value;
+  const imageInput = document.getElementById('postImage');
+
+  if (!text && !imageInput.files[0]) {
+    alert('Please add text or select an image.');
+    return;
+  }
+
+  const newPost = { text, color };
+
+  if (imageInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      newPost.img = e.target.result;
+      posts.unshift(newPost);
+      savePosts();
+      renderPosts();
+    };
+    reader.readAsDataURL(imageInput.files[0]);
+  } else {
+    posts.unshift(newPost);
+    savePosts();
+    renderPosts();
+  }
+
+
+  document.getElementById('postText').value = '';
+  imageInput.value = '';
+}
+
+
+function savePosts() {
+  localStorage.setItem('posts', JSON.stringify(posts));
+}
+
+
+window.addEventListener('DOMContentLoaded', renderPosts);
