@@ -2,20 +2,28 @@ let history = [];
 let lastMood = 'neutral';
 let lastReply = "";
 
+
 function showSection(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const section = document.getElementById(id);
+  if(section) section.classList.add('active');
 
   document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
   const navMap = { home:'nav-home', features:'nav-features', message:'nav-message' };
-  if(navMap[id]) document.getElementById(navMap[id]).classList.add('active');
+  if(navMap[id]){
+    const navItem = document.getElementById(navMap[id]);
+    if(navItem) navItem.classList.add('active');
+  }
 }
+
 
 const toggle = document.getElementById("themeToggle");
 const root = document.documentElement;
 const savedTheme = localStorage.getItem("theme");
 
-if(savedTheme) root.setAttribute("data-theme", savedTheme);
+if(savedTheme){
+  root.setAttribute("data-theme", savedTheme);
+}
 
 if(toggle){
   toggle.addEventListener("click", () => {
@@ -25,6 +33,165 @@ if(toggle){
     localStorage.setItem("theme", next);
   });
 }
+
+function sendMessage(){
+
+  const input = document.getElementById('input');
+  const messages = document.getElementById('messages');
+  const ventToggle = document.getElementById('ventToggle');
+
+  if(!input || !messages) return;
+  if(!input.value.trim()) return;
+
+  const vent = ventToggle ? ventToggle.checked : false;
+
+  const user = document.createElement('div');
+  user.className = 'user';
+  user.textContent = input.value;
+  messages.appendChild(user);
+
+  messages.scrollTop = messages.scrollHeight;
+
+  const rawText = input.value;
+  const text = rawText.toLowerCase();
+
+  history.push(text);
+  if(history.length > 6) history.shift();
+
+  input.value = '';
+
+  const bot = document.createElement('div');
+  bot.className = 'bot';
+
+  setTimeout(() => {
+    bot.textContent = generateReply(text, vent);
+    messages.appendChild(bot);
+    messages.scrollTop = messages.scrollHeight;
+  }, 900);
+}
+
+function detectMood(msg){
+  if(msg.match(/sad|tired|pagod|iyak|hurt|pain/)) return 'sad';
+  if(msg.match(/angry|galit|inis|frustrated/)) return 'angry';
+  if(msg.match(/alone|lonely|mag-isa/)) return 'lonely';
+  if(msg.match(/confused|lost|di ko alam|nalilito/)) return 'confused';
+  if(msg.match(/happy|okay na|relieved|masaya/)) return 'happy';
+  return 'neutral';
+}
+
+function generateReply(msg, vent){
+
+  const mood = detectMood(msg);
+  lastMood = mood;
+
+  function pickRandom(arr){
+    let reply;
+    do{
+      reply = arr[Math.floor(Math.random()*arr.length)];
+    } while(reply === lastReply && arr.length > 1);
+
+    lastReply = reply;
+    return reply;
+  }
+
+  if(vent){
+    return pickRandom([
+      "Nandito lang ako. You don’t have to explain everything. Just let it out.",
+      "Okay lang kung magulo yung kwento mo. Hindi kita huhusgahan.",
+      "I’m here. Kahit paulit-ulit, kahit tahimik, okay lang.",
+      "Take your time. Hindi ka istorbo dito.",
+      "You can breathe here. Walang pressure."
+    ]);
+  }
+
+  if(mood === 'sad'){
+    return pickRandom([
+      "I’m really sorry you’re feeling this way. Minsan kahit anong lakas natin, napapagod din talaga.",
+      "Mukhang mabigat yung dinadala mo ngayon. Hindi mo kailangang buhatin lahat mag-isa.",
+      "It’s okay to feel this pain. Hindi ka broken—nasasaktan ka lang.",
+      "Some days are heavier than others. Today might be one of those days.",
+      "Kung pagod ka na, pahinga muna. Hindi ibig sabihin sumusuko ka."
+    ]);
+  }
+
+  if(mood === 'angry'){
+    return pickRandom([
+      "Ramdam ko yung galit mo. Minsan galit is pain that wasn’t heard.",
+      "Okay lang magalit. May pinanggagalingan yan, and valid yun.",
+      "You don’t have to suppress it here. Safe kang maglabas.",
+      "Galit can be exhausting. Salamat sa pag-share.",
+      "Hindi ka masamang tao dahil nagagalit ka."
+    ]);
+  }
+
+  if(mood === 'lonely'){
+    return pickRandom([
+      "Masakit ang pakiramdam ng mag-isa, lalo na kapag walang nakakaintindi.",
+      "Even if it feels quiet right now, you’re not invisible here.",
+      "Hindi ka nag-iisa dito. Kahit ngayon lang, may kasama ka.",
+      "Loneliness doesn’t mean you’re unlovable.",
+      "Minsan isang nakikinig lang sapat na."
+    ]);
+  }
+
+  if(mood === 'confused'){
+    return pickRandom([
+      "Nakakapagod kapag hindi mo alam kung saan ka papunta.",
+      "Hindi mo kailangang may sagot agad.",
+      "Okay lang malito. Hindi ibig sabihin mahina ka.",
+      "Let’s slow this down. One thought at a time.",
+      "You’re allowed to pause."
+    ]);
+  }
+
+  if(mood === 'happy'){
+    return pickRandom([
+      "I’m really glad you shared this.",
+      "You deserve moments like this.",
+      "Hold on to that feeling—even if it’s small.",
+      "Masaya akong marinig yan.",
+      "That lightness you’re feeling? It’s real."
+    ]);
+  }
+
+  if(history.length >= 4){
+    return pickRandom([
+      "I’m still here. Hindi ka nag-iisa sa kwento mo.",
+      "You’ve shared a lot already. Walang deadline dito.",
+      "I’m following your story. Take your time.",
+      "You don’t need to impress anyone here.",
+      "It’s okay if you’re not sure what to say next."
+    ]);
+  }
+
+  return pickRandom([
+    "Salamat sa pagbabahagi. I’m here with you.",
+    "Safe ka dito.",
+    "Nandito lang ako, nakikinig.",
+    "Take your time.",
+    "I’m listening."
+  ]);
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+
+  const sendBtn = document.getElementById("sendBtn");
+  const input = document.getElementById("input");
+
+  if(sendBtn){
+    sendBtn.addEventListener("click", sendMessage);
+  }
+
+  if(input){
+    input.addEventListener("keydown", function(e){
+      if(e.key === "Enter"){
+        sendMessage();
+      }
+    });
+  }
+
+});
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyBgE5thxZSb634SOXLDmt9278JYLtRkRSo",
@@ -187,3 +354,8 @@ async function addPost(){
 }
 
 renderPosts();
+
+
+
+
+  
